@@ -27,8 +27,6 @@ class Piece
   def possible_slide_moves(current_pos)
     poss_slide_moves = []
     x, y = current_pos
-    #moves one place
-    #based on direction, can move towards one of two diagonals
 
     #1. get diagonals
     move_dirs = get_move_dirs
@@ -45,17 +43,38 @@ class Piece
       end
     end
     #5. return the possible slide moves
-    raise InvalidMoveError if poss_slide_moves.empty?
     poss_slide_moves
   end
 
-  def possible_jump_moves
+  def possible_jump_moves(current_pos) #TODO refactor this!
+    x,y = current_pos
+    poss_jump_moves = []
     #find opportunities to kill
+
+    #get diagonals
+    move_dirs = get_move_dirs
+    #add diagonals to current pos
+    move_dirs.each do |move_dir|
+      dx, dy = move_dir
+      #2. add diagonals to current_pos
+      new_x = x + dx
+      new_y = y + dy
+      new_pos = [new_x, new_y]
+      #3. ensure that new_pos is within range and #4. ensure that spot is enemy
+      if pos_within_range?(new_pos) && !@board[new_pos].nil? && @board[new_pos].color != color
+        poss_jump_moves << new_pos if @board[[(new_x+dx), (new_y+dy)]].nil?
+      end
+      #ensure that spot after is empty
+    end
+    #return possible jump move_dirs
+    poss_jump_moves
   end
 
   # def perform_slide
   #   #validates slide_moves
   #   #illegal move should raise an InvalidMoveError
+  ##    5. Raise an error if there are no valid moves
+  ##    raise InvalidMoveError if poss_slide_moves.empty?
   # end
 
   # def perform_jump
