@@ -1,4 +1,3 @@
-require 'debugger'
 require './board.rb'
 
 class Piece
@@ -11,12 +10,14 @@ class Piece
   end
 
   def display
-    color.to_s[0].upcase #return "W" or "R"
+    # color.to_s[0].upcase #return "W" or "R"
+    return "\u26ab" if color == :black
+    return "\u26aa" if color == :white
   end
 
   def get_move_dirs
   y_dir = (color == :black) ? -1 : 1 #return y_dir based on color
-  [ [ 1, y_dir], [-1, y_dir] ]
+  [ [y_dir, -1], [y_dir, 1] ]
   end
 
   def pos_within_range?(pos)
@@ -24,7 +25,6 @@ class Piece
   end
 
   def possible_slide_moves(current_pos)
-    debugger
     poss_slide_moves = []
     x, y = current_pos
     #moves one place
@@ -45,7 +45,7 @@ class Piece
       #4. ensure that spot is nil
       poss_slide_moves << new_pos if @board[new_pos].nil?
     end
-    #5. return the possible slide movees
+    #5. return the possible slide moves
     poss_slide_moves
   end
 
