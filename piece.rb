@@ -16,7 +16,7 @@ class Piece
   end
 
   def get_move_dirs
-  y_dir = (color == :black) ? -1 : 1 #return y_dir based on color
+  y_dir = (color == :black) ? 1 : -1 #return y_dir based on color
   [ [y_dir, -1], [y_dir, 1] ]
   end
 
@@ -39,13 +39,13 @@ class Piece
       new_x = x + dx
       new_y = y + dy
       new_pos = [new_x, new_y]
-      #3. ensure that new_pos is within range
-      pos_within_range?(new_pos)
-
-      #4. ensure that spot is nil
-      poss_slide_moves << new_pos if @board[new_pos].nil?
+      #3. ensure that new_pos is within range and #4. ensure that spot is nil
+      if pos_within_range?(new_pos) && @board[new_pos].nil?
+        poss_slide_moves << new_pos
+      end
     end
     #5. return the possible slide moves
+    raise InvalidMoveError if poss_slide_moves.empty?
     poss_slide_moves
   end
 
