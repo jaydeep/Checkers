@@ -18,6 +18,11 @@ class Board
     render_board
   end
 
+  def [](pos)
+    x, y = pos
+    @board[x][y]
+  end
+
   def create_row(row_num, color, offset = 0)
     4.times do |col|
       @board[row_num][col*2+offset] = Piece.new(color, self)
@@ -46,4 +51,6 @@ end
 #for testing in terminal
 if __FILE__ == $PROGRAM_NAME
   brd = Board.new
+  p brd[[5,0]].possible_slide_moves([5,0])
+  p brd[[5,2]].possible_slide_moves([5,2])
 end
