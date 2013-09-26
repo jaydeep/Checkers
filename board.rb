@@ -20,7 +20,26 @@ class Board
 
   def [](pos)
     x, y = pos
+    raise NilObjectError if @board[x][y].nil?
     @board[x][y]
+  end
+
+  def []=(pos, val)
+    x,y = pos
+    @board[x][y] = val
+  end
+
+  def move_piece(start_pos, end_pos)
+    self[end_pos], self[start_pos] = self[start_pos], nil
+  end
+
+  def jump_piece(start_pos, end_pos)
+    move_piece(start_pos, end_pos)
+    #determine jumped piece
+    jumped_x = (end_pos[0] + start_pos[0])/2
+    jumped_y = (end_pos[1] + start_pos[1])/2
+    self[[jumped_x, jumped_y]] = nil
+    p [jumped_x, jumped_y]
   end
 
   def create_row(row_num, color, offset = 0)
@@ -39,7 +58,7 @@ class Board
       end
       # print "\n"
     end
-    print "\n"
+    print "\n\n\n"
   end
 
   def dup
@@ -53,7 +72,22 @@ end
 
 #for testing in terminal
 if __FILE__ == $PROGRAM_NAME
+  begin
   brd = Board.new
-  p brd[[5,0]].possible_slide_moves([5,0])
-  p brd[[5,2]].possible_slide_moves([5,2])
+  brd.move_piece([2,3], [3,2])
+  brd.render_board
+  brd.move_piece([3,2], [4,3])
+  brd.render_board
+  p brd[[5,2]].possible_jump_moves([5,2])
+  p brd[[5,4]].possible_jump_moves([5,4])
+  p brd[[4,3]].possible_jump_moves([4,3])
+  p brd[[5,2]].perform_jump([5,2], [3,4])
+  brd[[4,3]].perform_jump([4,3],[5,2])
+  rescue NilObjectError => e
+    puts "piece doesn't exist!"
+  rescue InvalidMoveError => e
+    puts "move not possible!"
+  ensure
+    brd.render_board
+  end
 end

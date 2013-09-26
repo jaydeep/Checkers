@@ -62,7 +62,7 @@ class Piece
       new_pos = [new_x, new_y]
       #3. ensure that new_pos is within range and #4. ensure that spot is enemy
       if pos_within_range?(new_pos) && !@board[new_pos].nil? && @board[new_pos].color != color
-        poss_jump_moves << new_pos if @board[[(new_x+dx), (new_y+dy)]].nil?
+        poss_jump_moves << [(new_x+dx), (new_y+dy)] if @board[[(new_x+dx), (new_y+dy)]].nil?
       end
       #ensure that spot after is empty
     end
@@ -70,19 +70,15 @@ class Piece
     poss_jump_moves
   end
 
-  # def perform_slide
-  #   #validates slide_moves
-  #   #illegal move should raise an InvalidMoveError
-  ##    5. Raise an error if there are no valid moves
-  ##    raise InvalidMoveError if poss_slide_moves.empty?
-  # end
+  def perform_slide(current_pos, end_pos)
+    raise InvalidMoveError unless possible_slide_moves(current_pos).include?(end_pos)
+    @board.move_piece(current_pos, end_pos)
+  end
 
-  # def perform_jump
-  #   #validate jump_moves
-  #   #illegal move should raise an InvalidMoveError
-
-  #   #remove_jumped piece from board
-  # end
+  def perform_jump(current_pos, end_pos)
+    raise InvalidMoveError unless possible_jump_moves(current_pos).include?(end_pos)
+    @board.jump_piece(current_pos, end_pos)
+  end
 
   # def perform_moves!(move_sequence)
   #   #takes a sequence of moves. Move can be one or many
@@ -100,4 +96,10 @@ class Piece
   # def perform_moves
   #   #checks valid_move_seq, and calls perform_moves! or raises an MoveError
   # end
+end
+
+class NilObjectError < StandardError
+end
+
+class InvalidMoveError < StandardError
 end
