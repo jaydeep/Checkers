@@ -11,8 +11,8 @@ class Board
     (0..7).each do |row_num|
       next if row_num == 3 || row_num == 4
       offset = (row_num % 2 == 0) ? 1 : 0 #determine offset
-      create_row(row_num,"R",offset) if row_num < 3 #red is first 3 rows
-      create_row(row_num,"W",offset) if row_num > 4 #white is last 3 rows
+      create_row(row_num, :black, offset) if row_num < 3 #red is first 3 rows
+      create_row(row_num, :red, offset) if row_num > 4 #white is last 3 rows
     end
 
     render_board
@@ -27,7 +27,7 @@ class Board
   def render_board
     (0..7).each do |i|
       (0..7).each do |j|
-        print (@board[i][j].nil?) ? "_" : @board[i][j].color
+        print (@board[i][j].nil?) ? "_" : @board[i][j].display
       end
       print "\n"
     end
