@@ -12,6 +12,7 @@ class Piece
 
   def display
     # color.to_s[0].upcase #return "W" or "R"
+    #implement king looks
     return "\u26ab" if color == :black
     return "\u26aa" if color == :white
   end
@@ -21,8 +22,16 @@ class Piece
   end
 
   def get_move_dirs
-    y_dir = (color == :black) ? 1 : -1 #return y_dir based on color
-    [ [y_dir, -1], [y_dir, 1] ]
+    if @king = false
+      y_dir = (color == :black) ? 1 : -1 #return y_dir based on color
+      [ [y_dir, -1], [y_dir, 1] ]
+    else
+      [ [1, -1], [1, 1], [-1, -1], [-1, 1] ]
+    end
+  end
+
+  def get_jump_dirs
+    [ [1, -1], [1, 1], [-1, -1], [-1, 1] ]
   end
 
   def pos_within_range?(pos)
@@ -57,7 +66,7 @@ class Piece
     #find opportunities to kill
 
     #get diagonals
-    move_dirs = get_move_dirs
+    move_dirs = get_jump_dirs
     #add diagonals to current pos
     move_dirs.each do |move_dir|
       dx, dy = move_dir
