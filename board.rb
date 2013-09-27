@@ -1,10 +1,11 @@
 require './piece.rb'
 
 class Board
+  attr_reader :board
 
-  def initialize
+  def initialize(board = "")
     @board = Array.new(8) { Array.new(8) }
-    setup #remove after done testing
+    setup if board == ""
   end
 
   def setup
@@ -20,13 +21,18 @@ class Board
 
   def [](pos)
     x, y = pos
-    raise NilObjectError if @board[x][y].nil?
+    # raise NilObjectError if @board[x][y].nil?
     @board[x][y]
   end
 
   def []=(pos, val)
     x,y = pos
     @board[x][y] = val
+  end
+
+  def move(move_sequence)
+      start_pos = move_sequence[0]
+      self[start_pos].perform_moves(move_sequence)
   end
 
   def move_piece(start_pos, end_pos)
@@ -38,8 +44,8 @@ class Board
     #determine jumped piece
     jumped_x = (end_pos[0] + start_pos[0])/2
     jumped_y = (end_pos[1] + start_pos[1])/2
+    #remove jumped piece
     self[[jumped_x, jumped_y]] = nil
-    p [jumped_x, jumped_y]
   end
 
   def create_row(row_num, color, offset = 0)
@@ -62,27 +68,36 @@ class Board
   end
 
   def dup
+    dup_board = Board.new("dup")
 
+    (0..7).each do |i|
+      (0..7).each do |j|
+        next if @board[i][j].nil?
+        piece = @board[i][j]
+        dup_board[[i, j]] = piece.special_dup(dup_board)
+      end
+    end
+    print "duplicate\n"
+    dup_board.render_board
+    dup_board
   end
-
-  def remove_piece
-  end
-
 end
 
 #for testing in terminal
 if __FILE__ == $PROGRAM_NAME
   begin
   brd = Board.new
-  brd.move_piece([2,3], [3,2])
-  brd.render_board
-  brd.move_piece([3,2], [4,3])
-  brd.render_board
-  p brd[[5,2]].possible_jump_moves([5,2])
-  p brd[[5,4]].possible_jump_moves([5,4])
-  p brd[[4,3]].possible_jump_moves([4,3])
-  p brd[[5,2]].perform_jump([5,2], [3,4])
-  brd[[4,3]].perform_jump([4,3],[5,2])
+  brd.move([ [2,3], [3,4] ])
+  # brd.render_board
+  # brd.move([ [3,4], [4,3] ])
+
+  # brd.render_board
+  # brd.move([ [1,2], [2,3] ])
+  # brd.render_board
+  # brd.move([ [5,2], [3,4], [1,2] ])
+  # brd[[3,2]].perform_move([3,2], [4,3])
+  # brd.render_board
+  # brd[[5,2]].perform_moves!([[5,2], [3,4]])
   rescue NilObjectError => e
     puts "piece doesn't exist!"
   rescue InvalidMoveError => e

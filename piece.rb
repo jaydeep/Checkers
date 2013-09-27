@@ -1,12 +1,13 @@
 require './board.rb'
 
 class Piece
-  attr_reader :color, :king
+  attr_reader   :color
+  attr_accessor :king
 
-  def initialize(color, board)
+  def initialize(color, board, king = false)
     @color = color
     @board = board
-    @king  = false
+    @king  = king
   end
 
   def display
@@ -15,9 +16,13 @@ class Piece
     return "\u26aa" if color == :white
   end
 
+  def special_dup(dup_board)
+    self.class.new(self.color, dup_board, self.king)
+  end
+
   def get_move_dirs
-  y_dir = (color == :black) ? 1 : -1 #return y_dir based on color
-  [ [y_dir, -1], [y_dir, 1] ]
+    y_dir = (color == :black) ? 1 : -1 #return y_dir based on color
+    [ [y_dir, -1], [y_dir, 1] ]
   end
 
   def pos_within_range?(pos)
@@ -61,11 +66,14 @@ class Piece
       new_y = y + dy
       new_pos = [new_x, new_y]
       #3. ensure that new_pos is within range and #4. ensure that spot is enemy
-      if pos_within_range?(new_pos) && !@board[new_pos].nil? && @board[new_pos].color != color
-        poss_jump_moves << [(new_x+dx), (new_y+dy)] if @board[[(new_x+dx), (new_y+dy)]].nil?
+      if pos_within_range?(new_pos) && @board[new_pos].is_a?(Piece)
+        #5. ensure that spot after is empty
+        if @board[new_pos].color != color && @board[[(new_x+dx), (new_y+dy)]].nil?
+          poss_jump_moves << [(new_x+dx), (new_y+dy)]
+        end
       end
-      #ensure that spot after is empty
     end
+
     #return possible jump move_dirs
     poss_jump_moves
   end
@@ -80,22 +88,56 @@ class Piece
     @board.jump_piece(current_pos, end_pos)
   end
 
-  # def perform_moves!(move_sequence)
-  #   #takes a sequence of moves. Move can be one or many
-  #   #Performs moves one at a time,  Invalid MoveError should be raised
-  #   #don't worry about restoring Board state if move sequence fails
-  # end
+  def perform_moves!(move_sequence)
+    #takes a sequence of moves. Move can be one or many jumps
+    start_pos = move_sequence.shift
+    if move_sequence.length == 1
+      end_pos = move_sequence.shift
+      print start_pos, end_pos, "\n"
+      perform_slide(start_pos, end_pos)
+      puts "Duplicate-TESTING----------------------"
+      @board.render_board
+    else
+      move_sequence.each do |end_pos|
+        print start_pos, end_pos, "\njump?"
+        perform_jump(start_pos, end_pos)
+        start_pos = end_pos
+        puts "Duplicate-TESTING----------------------"
+        @board.render_board
+      end
+      print "Duplicate-TESTING-Complete----------------\n"
+    end
+  end
 
-  # def valid_move_seq?
-  #   #dup the board
-  #   #call perform_moves on duped board
-  #   #return true if no eroror is raised
-  #   #else return false
-  # end
+  def valid_move_seq?(move_sequence)
+    #dup the board
+    dup_board = @board.dup
+    dup_move_seq = move_sequence.dup
+    valid = true
 
-  # def perform_moves
-  #   #checks valid_move_seq, and calls perform_moves! or raises an MoveError
-  # end
+    # call perform_moves on duped board
+    begin
+      start_pos = move_sequence[0]
+      # dup_board.render_board
+      dup_board[start_pos].perform_moves!(dup_move_seq)
+      print "hello?"
+    rescue InvalidMoveError => e
+      valid = false
+    ensure
+      print valid
+      return valid
+    end
+  end
+
+  def perform_moves(move_seq)
+    begin
+      # perform_moves!(move_seq) if valid_move_seq?(move_seq)
+      perform_moves!(move_seq) if valid_move_seq?(move_seq)
+    rescue InvalidMoveError
+      puts "Why?"
+    end
+  end
+
 end
 
 class NilObjectError < StandardError
