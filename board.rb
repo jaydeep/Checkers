@@ -55,14 +55,13 @@ class Board
   end
 
   def render_board
-    print " "; (0..7).each {|n| print " #{n}"};
+    print "\n "; (0..7).each {|n| print " #{n}"};
     (0..7).each do |i|
       print "\n#{i} "
       (0..7).each do |j|
         print (@board[i][j].nil?) ? "\u25a2" : @board[i][j].display
         print " "
       end
-      # print "\n"
     end
     print "\n\n\n"
   end
@@ -88,16 +87,14 @@ if __FILE__ == $PROGRAM_NAME
   begin
   brd = Board.new
   brd.move([ [2,3], [3,4] ])
-  # brd.render_board
-  # brd.move([ [3,4], [4,3] ])
-
-  # brd.render_board
-  # brd.move([ [1,2], [2,3] ])
-  # brd.render_board
-  # brd.move([ [5,2], [3,4], [1,2] ])
-  # brd[[3,2]].perform_move([3,2], [4,3])
-  # brd.render_board
-  # brd[[5,2]].perform_moves!([[5,2], [3,4]])
+  brd.render_board
+  brd.move([ [3,4], [4,3] ])
+  puts "back in board.rb"
+  brd.render_board
+  brd.move([ [1,2], [2,3] ])
+  brd.render_board
+  brd.move([ [5,2], [3,4], [1,2] ])
+  brd.move([ [0,1], [2,3], [3,2] ])
   rescue NilObjectError => e
     puts "piece doesn't exist!"
   rescue InvalidMoveError => e

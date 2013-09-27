@@ -94,18 +94,19 @@ class Piece
     if move_sequence.length == 1
       end_pos = move_sequence.shift
       print start_pos, end_pos, "\n"
+      # puts "Duplicate-TESTING----------------------"
       perform_slide(start_pos, end_pos)
-      puts "Duplicate-TESTING----------------------"
-      @board.render_board
+      # @board.render_board
+      # print "Duplicate-TESTING-Complete----------------"
     else
+      # puts "Duplicate-TESTING----------------------"
       move_sequence.each do |end_pos|
-        print start_pos, end_pos, "\njump?"
+        # print start_pos, end_pos, "\njump?"
         perform_jump(start_pos, end_pos)
         start_pos = end_pos
-        puts "Duplicate-TESTING----------------------"
         @board.render_board
       end
-      print "Duplicate-TESTING-Complete----------------\n"
+      # print "Duplicate-TESTING-Complete----------------\n"
     end
   end
 
@@ -120,21 +121,19 @@ class Piece
       start_pos = move_sequence[0]
       # dup_board.render_board
       dup_board[start_pos].perform_moves!(dup_move_seq)
-      print "hello?"
+      print "hello?\n"
     rescue InvalidMoveError => e
       valid = false
     ensure
-      print valid
       return valid
     end
   end
 
   def perform_moves(move_seq)
-    begin
-      # perform_moves!(move_seq) if valid_move_seq?(move_seq)
-      perform_moves!(move_seq) if valid_move_seq?(move_seq)
-    rescue InvalidMoveError
-      puts "Why?"
+    if valid_move_seq?(move_seq)
+      perform_moves!(move_seq)
+    else
+      raise InvalidMoveError
     end
   end
 
